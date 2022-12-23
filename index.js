@@ -39,6 +39,7 @@ class Projectile{
     }
 
     update() {
+        this.draw()
         this.x = this.x  + this.velocity.x
         this.y = this.y + this.velocity.y
     }
@@ -50,24 +51,29 @@ const y = canvas.height / 2
 const player = new Player(x, y, 30, 'red')
 player.draw()
 
-const projectile = new Projectile(
-    canvas.width / 2, 
-    canvas.height / 2,
-    5,
-    'green',
-    {
-        x: 1,
-        y: 1
-    }
-)
+
+const projectiles = []
 
 function animate() {
     requestAnimationFrame(animate)
-    projectile.draw()
-    projectile.update()
+    projectiles.forEach((projectile) => {
+        projectile.update()
+    })
 }
 
 addEventListener('click', (event) => {
+    const angle = Math.atan2
+        (event.clientY - canvas.height / 2,
+         event.clientX - canvas.width / 2)
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+    }
+    projectiles.push(
+        new Projectile(canvas.width / 2,
+            canvas.height / 2, 5, 'red', velocity
+            )
+    )
 })
 
 animate()
