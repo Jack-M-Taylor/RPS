@@ -68,7 +68,7 @@ class Enemy {
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-const player = new Player(x, y, 30, "red");
+const player = new Player(x, y, 15, "red");
 const projectiles = [];
 const enemies = [];
 
@@ -100,7 +100,7 @@ function spawnEnemies() {
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
-  c.fillStyle = 'rgba(0, 0, 0, 0.07)'
+  c.fillStyle = "rgba(0, 0, 0, 0.07)";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
   projectiles.forEach((projectile, index) => {
