@@ -65,6 +65,7 @@ class Enemy {
   }
 }
 
+const friction = 0.99
 class Particle {
   constructor(x, y, radius, color, velocity) {
     this.x = x;
@@ -87,6 +88,8 @@ class Particle {
 
   update() {
     this.draw();
+    this.velocity.x *= friction
+    this.velocity.y *= friction
     this.x = this.x + this.velocity.x;
     this.y = this.y + this.velocity.y;
     this.alpha -= 0.01;
@@ -132,7 +135,7 @@ function animate() {
   c.fillStyle = "rgba(0, 0, 0, 0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
-  particles.forEach((particle) => {
+  particles.forEach((particle, index) => {
     if (particle.alpha <= 0) {
       particles.splice(index, 1);
     } else {
@@ -156,6 +159,22 @@ function animate() {
     }
   });
 
+  particles.forEach((particle, index) => {
+    particle.update();
+
+    //remove from edges of screen
+    if (
+      particle.x + particle.radius < 0 ||
+      particle.x - particle.radius > canvas.width ||
+      particle.y + particle.radius < 0 ||
+      particle.y - particle.radius > canvas.height
+    ) {
+      setTimeout(() => {
+        particles.splice(index, 1);
+      }, 0);
+    }
+  });
+
   enemies.forEach((enemy, index) => {
     enemy.update();
 
@@ -171,15 +190,15 @@ function animate() {
       if (dist - enemy.radius - projectile.radius < 1) {
         // create explosions
         for (let i = 0; i < enemy.radius * 2; i++) {
-          projectiles.push(
+          particles.push(
             new Particle(
               projectile.x,
               projectile.y,
               Math.random() * 2,
               enemy.color,
               {
-                x: (Math.random() - 0.5) * (Math.random() * 8),
-                y: (Math.random() - 0.5) * (Math.random() * 8),
+                x: (Math.random() - 0.5) * (Math.random() * 6),
+                y: (Math.random() - 0.5) * (Math.random() * 6),
               }
             )
           );
@@ -212,12 +231,6 @@ addEventListener("click", (event) => {
     x: Math.cos(angle) * 5,
     y: Math.sin(angle) * 5,
   };
-
-  function randomIntFromInterval(min, max) {
-    // min and max included
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
-
   projectiles.push(
     new Projectile(
       canvas.width / 2,
