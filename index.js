@@ -4,6 +4,8 @@ const c = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+const scoreEl = document.querySelector('#scoreEl')
+
 class Player {
   constructor(x, y, radius, color) {
     this.x = x;
@@ -65,7 +67,7 @@ class Enemy {
   }
 }
 
-const friction = 0.99
+const friction = 1
 class Particle {
   constructor(x, y, radius, color, velocity) {
     this.x = x;
@@ -92,7 +94,7 @@ class Particle {
     this.velocity.y *= friction
     this.x = this.x + this.velocity.x;
     this.y = this.y + this.velocity.y;
-    this.alpha -= 0.01;
+    this.alpha -= 0.001;
   }
 }
 
@@ -130,6 +132,7 @@ function spawnEnemies() {
 }
 
 let animationId;
+let score = 0
 function animate() {
   animationId = requestAnimationFrame(animate);
   c.fillStyle = "rgba(0, 0, 0, 0.1)";
@@ -137,7 +140,7 @@ function animate() {
   player.draw();
   particles.forEach((particle, index) => {
     if (particle.alpha <= 0) {
-      particles.splice(index, 1);
+      particles.splice(index, 2);
     } else {
       particle.update();
     }
@@ -188,8 +191,9 @@ function animate() {
 
       //when projectiles touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
+        
         // create explosions
-        for (let i = 0; i < enemy.radius * 2; i++) {
+        for (let i = 0; i < enemy.radius; i++) {
           particles.push(
             new Particle(
               projectile.x,
@@ -197,14 +201,19 @@ function animate() {
               Math.random() * 2,
               enemy.color,
               {
-                x: (Math.random() - 0.5) * (Math.random() * 6),
-                y: (Math.random() - 0.5) * (Math.random() * 6),
+                x: (Math.random() - 0.5) * (Math.random() * 8),
+                y: (Math.random() - 0.5) * (Math.random() * 8),
               }
             )
           );
         }
 
         if (enemy.radius - 10 > 5) {
+
+        // increase score
+        score += 100
+        scoreEl.innerHTML = score
+
           gsap.to(enemy, {
             radius: enemy.radius - 15,
           });
@@ -212,6 +221,10 @@ function animate() {
             projectiles.splice(projectileIndex, 1);
           }, 0);
         } else {
+         // increase score
+        score += 25
+        scoreEl.innerHTML = score
+
           setTimeout(() => {
             enemies.splice(index, 1);
             projectiles.splice(projectileIndex, 1);
